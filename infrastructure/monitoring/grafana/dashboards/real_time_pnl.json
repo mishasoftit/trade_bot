@@ -1,0 +1,77 @@
+{
+  "title": "Real-time P&L Tracking",
+  "tags": ["trading", "profit-loss"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Cumulative P&L",
+      "type": "timeseries",
+      "gridPos": {"x":0,"y":0,"w":12,"h":8},
+      "targets": [
+        {
+          "expr": "sum(pnl_dollar) by (strategy)",
+          "legendFormat": "{{strategy}}"
+        }
+      ],
+      "options": {
+        "tooltip": {"mode": "single"},
+        "legend": {"displayMode": "list"}
+      }
+    },
+    {
+      "id": 2,
+      "title": "Hourly P&L",
+      "type": "barchart",
+      "gridPos": {"x":12,"y":0,"w":12,"h":8},
+      "targets": [
+        {
+          "expr": "sum(increase(pnl_dollar[1h])) by (strategy)",
+          "legendFormat": "{{strategy}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Top Performing Strategies",
+      "type": "table",
+      "gridPos": {"x":0,"y":8,"w":8,"h":8},
+      "targets": [
+        {
+          "expr": "topk(5, sum(pnl_dollar) by (strategy))",
+          "format": "table",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "P&L Anomaly Detection",
+      "type": "stat",
+      "gridPos": {"x":8,"y":8,"w":8,"h":4},
+      "targets": [
+        {
+          "expr": "abs(delta(pnl_dollar[1h])) > (stddev(pnl_dollar[1d]) * 3)",
+          "format": "table"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {"calcs": ["lastNotNull"]}
+      }
+    },
+    {
+      "id": 5,
+      "title": "Trading Volume",
+      "type": "timeseries",
+      "gridPos": {"x":16,"y":8,"w":8,"h":8},
+      "targets": [
+        {
+          "expr": "sum(trade_volume) by (exchange)",
+          "legendFormat": "{{exchange}}"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+name: Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["Build Containers"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: |
+          cd infrastructure/terraform
+          terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+                         -backend-config="key=staging.tfstate" \
+                         -backend-config="region=${{ secrets.AWS_REGION }}"
+
+      - name: Terraform Apply
+        run: |
+          cd infrastructure/terraform
+          terraform workspace select staging || terraform workspace new staging
+          terraform apply -auto-approve \
+            -var="db_username=${{ secrets.DB_USERNAME }}" \
+            -var="db_password=${{ secrets.DB_PASSWORD }}" \
+            -var="subnet_ids=${{ secrets.SUBNET_IDS }}" \
+            -var="ami_id=${{ secrets.AMI_ID }}"
+
+      - name: Deploy services
+        run: |
+          # This would be replaced with actual deployment commands
+          # using the infrastructure outputs to update services
+          echo "Deploying services to staging environment"
+          echo "TimescaleDB endpoint: $(terraform output -raw timescaledb_endpoint)"
+          echo "Redis endpoint: $(terraform output -raw redis_endpoint)"
+          echo "Kafka brokers: $(terraform output -raw kafka_bootstrap_brokers)"

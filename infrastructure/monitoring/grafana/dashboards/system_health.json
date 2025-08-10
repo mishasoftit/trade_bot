@@ -1,0 +1,95 @@
+{
+  "title": "System Health Monitoring",
+  "tags": ["infrastructure", "health"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Service Uptime",
+      "type": "stat",
+      "gridPos": {"x":0,"y":0,"w":6,"h":4},
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {"calcs": ["lastNotNull"]}
+      }
+    },
+    {
+      "id": 2,
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": {"x":6,"y":0,"w":6,"h":4},
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total[5m]) * 100",
+          "legendFormat": "CPU"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": {"x":12,"y":0,"w":6,"h":4},
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes",
+          "legendFormat": "Memory"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Order Throughput",
+      "type": "timeseries",
+      "gridPos": {"x":0,"y":4,"w":8,"h":4},
+      "targets": [
+        {
+          "expr": "rate(orders_processed_total[5m])",
+          "legendFormat": "Orders/s"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Error Rates",
+      "type": "timeseries",
+      "gridPos": {"x":8,"y":4,"w":8,"h":4},
+      "targets": [
+        {
+          "expr": "rate(http_requests_total{status=~'5..'}[5m])",
+          "legendFormat": "5xx Errors"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Queue Depths",
+      "type": "barchart",
+      "gridPos": {"x":16,"y":4,"w":8,"h":4},
+      "targets": [
+        {
+          "expr": "message_queue_depth",
+          "legendFormat": "Queue Depth"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Service Dependencies",
+      "type": "nodeGraph",
+      "gridPos": {"x":0,"y":8,"w":24,"h":8},
+      "targets": [
+        {
+          "expr": "trading_service_dependencies"
+        }
+      ]
+    }
+  ]
+}

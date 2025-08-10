@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'strategy-service'
+    static_configs:
+      - targets: ['strategy-service:8000']
+    metrics_path: '/metrics'
+
+  - job_name: 'risk-controller'
+    static_configs:
+      - targets: ['risk-controller:8080']
+    metrics_path: '/metrics'
+
+  - job_name: 'execution-engine'
+    static_configs:
+      - targets: ['execution-engine:8081']
+    metrics_path: '/metrics'
+
+  - job_name: 'custom-exporters'
+    static_configs:
+      - targets: ['exporters:9100']
+
+rule_files:
+  - 'alerts.yml'
+  - 'rules.yml'
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']

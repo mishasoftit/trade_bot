@@ -1,0 +1,18 @@
+# Environment variables
+.env
+
+# Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Data files
+data/
+
+# Editor files
+.vscode/
+.idea/

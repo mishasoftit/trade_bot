@@ -1,0 +1,112 @@
+groups:
+- name: infrastructure-alerts
+  rules:
+  - alert: HighErrorRate
+    expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High error rate on {{ $labels.instance }}"
+      description: "Error rate is above 5% for 10 minutes"
+
+  - alert: HighLatency
+    expr: histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m])) > 1
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High latency on {{ $labels.instance }}"
+      description: "99th percentile latency is above 1 second"
+
+  - alert: TimescaleDBDown
+    expr: up{job="timescaledb"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "TimescaleDB instance down"
+      description: "TimescaleDB has been down for more than 5 minutes"
+
+  - alert: RedisDown
+    expr: up{job="redis"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Redis instance down"
+      description: "Redis has been down for more than 5 minutes"
+
+  - alert: KafkaDown
+    expr: up{job="kafka"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Kafka cluster down"
+      description: "Kafka has been down for more than 5 minutes"
+
+  - alert: VaultDown
+    expr: up{job="vault"} == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Vault instance down"
+      description: "Vault has been down for more than 5 minutes"
+
+- name: trading-alerts
+  rules:
+  - alert: CircuitBreakerTriggered
+    expr: circuit_breaker_triggered > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Circuit breaker triggered on {{ $labels.service }}"
+      description: "Risk circuit breaker activated for {{ $labels.service }}"
+
+  - alert: HighRiskExposure
+    expr: risk_exposure_percentage > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High risk exposure on {{ $labels.service }}"
+      description: "Risk exposure {{ $value }}% exceeds 80% threshold"
+
+  - alert: LowFillRate
+    expr: order_fill_rate < 0.7
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Low order fill rate on {{ $labels.exchange }}"
+      description: "Fill rate {{ $value }} below 70% threshold"
+
+  - alert: HighAPILatency
+    expr: exchange_api_latency_seconds > 1
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High API latency on {{ $labels.exchange }}"
+      description: "API latency {{ $value }}s exceeds 1s threshold"
+
+  - alert: RiskCalcTimeout
+    expr: risk_calculation_time_seconds > 5
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Risk calculation timeout on {{ $labels.service }}"
+      description: "Risk calculation took {{ $value }}s exceeding 5s threshold"
+
+  - alert: PnLAnomaly
+    expr: abs(delta(pnl_dollar[1h])) > (stddev(pnl_dollar[1d]) * 3)
+    for: 30m
+    labels:
+      severity: critical
+    annotations:
+      summary: "P&L anomaly detected"
+      description: "Unusual P&L movement detected in strategy {{ $labels.strategy }}"

@@ -1,0 +1,41 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-services:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [strategy-service, risk-controller, execution-engine]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up service environment
+        run: |
+          cd ${{ matrix.service }}
+          if [ -f "requirements.txt" ]; then
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+          elif [ -f "Cargo.toml" ]; then
+            rustup default stable
+          elif [ -f "go.mod" ]; then
+            go version
+          fi
+
+      - name: Run tests
+        run: |
+          cd ${{ matrix.service }}
+          if [ -f "pytest.ini" ]; then
+            pytest -v
+          elif [ -f "Cargo.toml" ]; then
+            cargo test --verbose
+          elif [ -f "go.mod" ]; then
+            go test -v ./...
+          fi

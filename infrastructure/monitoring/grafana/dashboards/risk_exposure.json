@@ -1,0 +1,79 @@
+{
+  "title": "Risk Exposure Analysis",
+  "tags": ["trading", "risk"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Risk Exposure %",
+      "type": "gauge",
+      "gridPos": {"x":0,"y":0,"w":8,"h":8},
+      "targets": [
+        {
+          "expr": "risk_exposure_percentage",
+          "legendFormat": "Risk Exposure"
+        }
+      ],
+      "options": {
+        "min": 0,
+        "max": 100,
+        "thresholds": {
+          "mode": "absolute",
+          "steps": [
+            {"value": null, "color": "green"},
+            {"value": 70, "color": "yellow"},
+            {"value": 80, "color": "red"}
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Exposure by Strategy",
+      "type": "barchart",
+      "gridPos": {"x":8,"y":0,"w":8,"h":8},
+      "targets": [
+        {
+          "expr": "risk_exposure_percentage by (strategy)",
+          "legendFormat": "{{strategy}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Circuit Breaker Status",
+      "type": "state-timeline",
+      "gridPos": {"x":16,"y":0,"w":8,"h":8},
+      "targets": [
+        {
+          "expr": "circuit_breaker_triggered",
+          "legendFormat": "Breaker Status"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Position Sizes",
+      "type": "piechart",
+      "gridPos": {"x":0,"y":8,"w":12,"h":8},
+      "targets": [
+        {
+          "expr": "sum(position_size) by (symbol)",
+          "legendFormat": "{{symbol}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Leverage Ratios",
+      "type": "timeseries",
+      "gridPos": {"x":12,"y":8,"w":12,"h":8},
+      "targets": [
+        {
+          "expr": "leverage_ratio by (strategy)",
+          "legendFormat": "{{strategy}}"
+        }
+      ]
+    }
+  ]
+}

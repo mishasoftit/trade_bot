@@ -1,0 +1,58 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: system
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: varlogs
+      __path__: /var/log/*.log
+
+- job_name: trading-services
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: trading
+      __path__: /var/log/trading/*.log
+
+- job_name: strategy-service
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: strategy
+      __path__: /var/log/strategy/*.log
+
+- job_name: risk-controller
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: risk
+      __path__: /var/log/risk/*.log
+
+- job_name: execution-engine
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: execution
+      __path__: /var/log/execution/*.log
+
+- job_name: exporters
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: exporters
+      __path__: /var/log/exporters/*.log
