@@ -15,7 +15,7 @@ This project provides tools for detecting arbitrage opportunities, simulating tr
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/strategy-service.git
+git clone https://github.com/mishasoftit/trade_bot
 cd strategy-service
 ```
 
